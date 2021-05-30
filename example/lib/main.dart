@@ -74,10 +74,10 @@ class _MyHomePageState extends State<MyHomePage> {
           // Center is a layout widget. It takes a single child and positions it
           // in the middle of the parent.
           child: Container(
-        width: 100,
-        height: 100,
+        width: 500,
+        height: 500,
         decoration: BoxDecoration(border: Border.all(color: Colors.green)),
-        child: CoordinateDrawer(coordinates: grid
+        child: CoordinateDrawer(coordinates: germany
 
             //   Coordinate(lon: 0, lat: 0),lat:          //   Coordinate(lon: 10, lat: 10),lat:          //   Coordinate(lon: 20, lat: 20),lat:          //   Coordinate(lon: 30, lat: 30),lat:          //   Coordinate(lon: 40, lat: 10),lat:          //   Coordinate(lon: 50, lat: 30),lat:          //   Coordinate(lon: 60, lat: 20),lat:          //   Coordinate(lon: 70, lat: 10),lat:          //   Coordinate(lon: 80, lat: 20),lat:          //   Coordinate(lon: 50, lat: 10),lat:          // ]
             ),
@@ -89,46 +89,24 @@ class _MyHomePageState extends State<MyHomePage> {
 var grid = [
   Coordinate(lat: 0, lon: 0),
   Coordinate(lat: 0, lon: 10),
-  Coordinate(lat: 0, lon: 20),
-  Coordinate(lat: 0, lon: 30),
-  Coordinate(lat: 0, lon: 40),
-  Coordinate(lat: 0, lon: 50),
   Coordinate(lat: 10, lon: 0),
   Coordinate(lat: 10, lon: 10),
-  Coordinate(lat: 10, lon: 20),
-  Coordinate(lat: 10, lon: 30),
-  Coordinate(lat: 10, lon: 40),
-  Coordinate(lat: 10, lon: 50),
   Coordinate(lat: 20, lon: 0),
   Coordinate(lat: 20, lon: 10),
-  Coordinate(lat: 20, lon: 20),
-  Coordinate(lat: 20, lon: 30),
-  Coordinate(lat: 20, lon: 40),
-  Coordinate(lat: 20, lon: 50),
   Coordinate(lat: 30, lon: 0),
   Coordinate(lat: 30, lon: 10),
-  Coordinate(lat: 30, lon: 20),
-  Coordinate(lat: 30, lon: 30),
-  Coordinate(lat: 30, lon: 40),
-  Coordinate(lat: 30, lon: 50),
   Coordinate(lat: 40, lon: 0),
   Coordinate(lat: 40, lon: 10),
-  Coordinate(lat: 40, lon: 20),
-  Coordinate(lat: 40, lon: 30),
-  Coordinate(lat: 40, lon: 40),
-  Coordinate(lat: 40, lon: 50),
   Coordinate(lat: 50, lon: 0),
   Coordinate(lat: 50, lon: 10),
-  Coordinate(lat: 50, lon: 20),
-  Coordinate(lat: 50, lon: 30),
-  Coordinate(lat: 50, lon: 40),
-  Coordinate(lat: 50, lon: 50),
   Coordinate(lat: 60, lon: 0),
   Coordinate(lat: 60, lon: 10),
-  Coordinate(lat: 60, lon: 20),
-  Coordinate(lat: 60, lon: 30),
-  Coordinate(lat: 60, lon: 40),
-  Coordinate(lat: 60, lon: 50),
+  Coordinate(lat: 70, lon: 0),
+  Coordinate(lat: 70, lon: 10),
+  Coordinate(lat: 80, lon: 0),
+  Coordinate(lat: 80, lon: 10),
+  Coordinate(lat: 90, lon: 0),
+  Coordinate(lat: 90, lon: 10),
 ];
 
 var germany = [

@@ -53,13 +53,10 @@ class _Painter extends CustomPainter {
       ..style = PaintingStyle.stroke;
     Paint pointPaint = Paint()
       ..color = Colors.blue
-      ..strokeWidth = 3
+      ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
-    print(coordinateList.size);
-    print(coordinateList.center);
-
-    // // move canvas for centering
+    // move canvas for centering
     canvas.translate(-coordinateList.center.dx, -coordinateList.center.dy);
 
     for (int i = 0; i < coordinateList.length; i++) {

@@ -15,22 +15,28 @@ class Coordinate {
 class CoordinateList {
   CoordinateList(
     this.coordinates,
-  ) : offsets = coordinates.map((e) => coordinateToOffset(e)).toList() {
+  ) {
+    final cMaxX = coordinates.map((e) => e.lon).reduce(max);
+    final cMinX = coordinates.map((e) => e.lon).reduce(min);
+    final centerX = cMinX + (cMaxX - cMinX) / 2;
+    coordinates = coordinates
+        // center it for symmetric drawing
+        .map((e) => Coordinate(lat: e.lat, lon: e.lon - centerX))
+        .toList();
+    offsets = coordinates.map((e) => coordinateToOffset(e)).toList();
+
     minX = offsets.map((e) => e.dx).reduce(min);
     maxX = offsets.map((e) => e.dx).reduce(max);
     minY = offsets.map((e) => e.dy).reduce(min);
     maxY = offsets.map((e) => e.dy).reduce(max);
     points = offsets.map((e) => Offset(e.dx - minX, e.dy - minY)).toList();
-    print('size: $size');
-    print('topLeft: $topLeft');
-    print('topRight: $topRight');
-    print('size: $size');
+    points.forEach((element) {
+      print(element);
+    });
   }
 
-  // TODO: auf x-Achse verschieben um korrekte Projektion zu erlangen
-
-  final List<Coordinate> coordinates;
-  final List<Offset> offsets;
+  List<Coordinate> coordinates;
+  late List<Offset> offsets;
 
   late double minX;
   late double maxX;
@@ -45,9 +51,7 @@ class CoordinateList {
 
   static Offset coordinateToOffset(Coordinate coordinate) {
     final scale = 0.2;
-    double offset = cos(coordinate.lat * pi / 180) * 60 * scale;
-    double x = coordinate.lon * cos(coordinate.lat * pi / 180) * 60 * scale +
-        coordinate.lat; // TODO:??? korrektes offes berechnen
+    double x = coordinate.lon * cos(coordinate.lat * pi / 180) * 60 * scale;
     double y = -coordinate.lat * 60 * scale;
     return Offset(x, y);
   }
