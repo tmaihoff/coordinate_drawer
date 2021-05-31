@@ -15,24 +15,17 @@ class Coordinate {
 class CoordinateList {
   CoordinateList(
     this.coordinates,
+    this.constraint,
   ) {
     final maxLon = coordinates.map((e) => e.lon).reduce(max);
     final minLon = coordinates.map((e) => e.lon).reduce(min);
     final maxLat = coordinates.map((e) => e.lat).reduce(max);
     final minLat = coordinates.map((e) => e.lat).reduce(min);
-    final lonExtend = minLon + (maxLon - minLon);
-    final latExtend = minLat + (maxLat - minLat);
+    final lonExtend = maxLon - minLon;
+    final latExtend = maxLat - minLat;
     final maxExtend = List.of([lonExtend, latExtend]).reduce(max);
 
-    print(maxExtend);
-    // 0.1 -> 12
-    // 90 -> 0.02
-    // 55 -> 0.2
-    // 22 -> 0.07
-
-    scale = 0.02;
-    // 10 - 5 * List.of([lonExtend, latExtend]).reduce(max); // TODO: scale depending on max extend
-    print(scale);
+    pixelPerDegree = constraint.shortestSide / maxExtend;
 
     final centerX = minLon + (maxLon - minLon) / 2;
 
@@ -50,6 +43,8 @@ class CoordinateList {
   }
 
   List<Coordinate> coordinates;
+  final Size constraint;
+
   late List<Offset> offsets;
 
   late double minX;
@@ -57,7 +52,7 @@ class CoordinateList {
   late double minY;
   late double maxY;
   late List<Offset> points;
-  late double scale;
+  late double pixelPerDegree;
 
   List<Offset> get asOffsetList =>
       coordinates.map((e) => coordinateToOffset(e)).toList();
@@ -65,8 +60,8 @@ class CoordinateList {
   int get length => coordinates.length;
 
   Offset coordinateToOffset(Coordinate coordinate) {
-    double x = coordinate.lon * cos(coordinate.lat * pi / 180) * 60 * scale;
-    double y = -coordinate.lat * 60 * scale;
+    double x = coordinate.lon * cos(coordinate.lat * pi / 180) * pixelPerDegree;
+    double y = -coordinate.lat * pixelPerDegree;
     return Offset(x, y);
   }
 

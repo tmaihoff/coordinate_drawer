@@ -31,18 +31,49 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(title: Text(widget.title)),
       body: Center(
           child: Container(
-        width: 500,
-        height: 500,
+        width: 1000,
+        height: 1000,
         decoration: BoxDecoration(border: Border.all(color: Colors.green)),
-        child: CoordinateDrawer(coordinates: grid),
+        child: CoordinateDrawer(coordinates: germany),
       )),
     );
   }
 }
 
+List<Coordinate> getGlobus() {
+  List<Coordinate> list = [];
+  for (var i = 0; i < 35; i++) {
+    for (var j = -90; j < 90; j++) {
+      list.add(
+        Coordinate(lat: j * 1, lon: i * 10),
+      );
+    }
+  }
+  return list;
+}
+
+var globus = [
+  Coordinate(lat: 00, lon: 00),
+  Coordinate(lat: 10, lon: 00),
+  Coordinate(lat: 20, lon: 00),
+  Coordinate(lat: 30, lon: 00),
+  Coordinate(lat: 40, lon: 00),
+  Coordinate(lat: 50, lon: 00),
+  Coordinate(lat: 60, lon: 00),
+  Coordinate(lat: 70, lon: 00),
+  Coordinate(lat: 80, lon: 00),
+];
+
 var test = [
-  Coordinate(lat: 0, lon: 0),
-  Coordinate(lat: 0.1, lon: 0.1),
+  Coordinate(lat: 00, lon: 00),
+  Coordinate(lat: 10, lon: 00),
+  Coordinate(lat: 20, lon: 00),
+  Coordinate(lat: 30, lon: 00),
+  Coordinate(lat: 40, lon: 00),
+  Coordinate(lat: 50, lon: 00),
+  Coordinate(lat: 60, lon: 00),
+  Coordinate(lat: 70, lon: 00),
+  Coordinate(lat: 80, lon: 00),
 ];
 
 var grid = [

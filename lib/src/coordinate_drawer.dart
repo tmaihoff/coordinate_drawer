@@ -8,23 +8,22 @@ import 'coordinate.dart';
 class CoordinateDrawer extends StatelessWidget {
   final List<Coordinate> coordinates;
 
-  const CoordinateDrawer({
+  CoordinateDrawer({
     Key? key,
     required this.coordinates,
   }) : super(key: key);
-
-  final _referenceSize = const Size(100, 100);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Transform.scale(
-          scale:
-              constraints.smallest.shortestSide / _referenceSize.shortestSide,
-          child: Center(
-            child: CustomPaint(
-              painter: _Painter(coordinates),
+        return Center(
+          child: CustomPaint(
+            painter: _Painter(
+              CoordinateList(
+                coordinates,
+                constraints.biggest,
+              ),
             ),
           ),
         );
@@ -36,8 +35,7 @@ class CoordinateDrawer extends StatelessWidget {
 class _Painter extends CustomPainter {
   final CoordinateList coordinateList;
 
-  _Painter(List<Coordinate> coordinates)
-      : coordinateList = CoordinateList(coordinates);
+  _Painter(this.coordinateList);
 
   @override
   void paint(Canvas canvas, Size size) {
