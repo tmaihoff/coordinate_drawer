@@ -136,7 +136,7 @@ class _Painter extends CustomPainter {
     required this.pointPaint,
   });
 
-  static const drawDebug = true;
+  static const drawDebug = false;
 
   @override
   void paint(Canvas canvas, Size size) {
