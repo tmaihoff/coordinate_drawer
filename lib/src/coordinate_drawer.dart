@@ -16,10 +16,12 @@ class CoordinateDrawer extends StatelessWidget {
   final List<List<Coordinate>> coordinateLists;
 
   /// Specifies a point should be drawn for each coordinate.
+  /// Defaults to false.
   final bool drawPoints;
 
   /// Specifies if lines should be drawn between each consecutive coordinate of
   /// the separate coordinate lists.
+  /// Defaults to true.
   final bool drawLines;
 
   /// Whether a line should be drawn between the last and the first coordinate
@@ -103,6 +105,7 @@ class CoordinateDrawer extends StatelessWidget {
                 coordinates: CoordinatesToPoints(
                   coordinateLists: coordinateLists,
                   availableSize: constraints.biggest,
+                  customPixelPerDegree: pixelPerDegree,
                 ),
                 linePaint: getLinePaint(context),
                 pointPaint: getPointPaint(context),

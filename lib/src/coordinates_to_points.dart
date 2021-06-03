@@ -6,13 +6,16 @@ class CoordinatesToPoints {
   CoordinatesToPoints({
     required List<List<Coordinate>> coordinateLists,
     required Size availableSize,
+    required this.customPixelPerDegree,
   })  : _coordinateLists = coordinateLists,
         _availableSize = availableSize {
     _processCoordinates();
 
     _coordinatesToPoints();
 
-    _adjustScale();
+    if (customPixelPerDegree == null) {
+      _adjustScale();
+    }
 
     _makePointLists();
   }
@@ -21,6 +24,7 @@ class CoordinatesToPoints {
   List<Coordinate> get _flatCoordinateList =>
       _coordinateLists.expand((e) => e).toList();
   final Size _availableSize;
+  final double? customPixelPerDegree;
 
   double get minX => _pointsBounds.minX;
   double get maxX => _pointsBounds.maxX;
@@ -45,7 +49,7 @@ class CoordinatesToPoints {
     );
 
     //* 2
-    _pixelPerDegree =
+    _pixelPerDegree = customPixelPerDegree ??
         _availableSize.shortestSide / coordinateBounds.maxXYExtend;
 
     //* 3
