@@ -1,28 +1,115 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'coordinate.dart';
+import 'coordinates_to_points.dart';
 
 class CoordinateDrawer extends StatelessWidget {
-  final List<Coordinate> coordinates;
+  /// List of coordinate lists which should be painted.
+  /// Provide separate lists if the drawn line should be broken up.
+  /// Useful e.g. for a list of island coordinates.
+  /// Here you would provide a list of coordinates for each island.
+  /// Providing one flat map with the coordinates of all islands would result
+  /// in lines being drawn between the islands.
+  final List<List<Coordinate>> coordinateLists;
 
-  CoordinateDrawer({
+  /// Specifies a point should be drawn for each coordinate.
+  final bool drawPoints;
+
+  /// Specifies if lines should be drawn between each consecutive coordinate of
+  /// the separate coordinate lists.
+  final bool drawLines;
+
+  /// Whether a line should be drawn between the last and the first coordinate
+  /// of one coordinate list.
+  /// Should be true e.g. for drawing the border of a country.
+  /// Should be false e.g. for drawing a one-way route.
+  /// Defaults to false.
+  final bool closeShapes;
+
+  /// The color of the drawn lines.
+  /// Overridden by [customLinePaint], if specified.
+  final Color? lineColor;
+
+  /// The line width of the drawn lines.
+  /// Overridden by [customLinePaint], if specified.
+  final double? lineWidth;
+
+  /// The color of the drawn points.
+  /// Overridden by [customPointPaint], if specified.
+  final Color? pointColor;
+
+  /// The size of the drawn points.
+  /// Overridden by [customPointPaint], if specified.
+  final double? pointSize;
+
+  /// [Paint] to be used for drawing the lines.
+  /// Overrides [lineColor] and [lineWidth].
+  final Paint? customLinePaint;
+
+  /// [Paint] to be used for drawing the points.
+  /// Overrides [pointColor] and [pointSize].
+  final Paint? customPointPaint;
+
+  /// Overrides and directly sets the [pixelPerDegree] value.
+  /// If it is not specified the value is dynamically calculated depending on
+  ///  the given coordinates and the available space.
+  final double? pixelPerDegree;
+
+  const CoordinateDrawer({
     Key? key,
-    required this.coordinates,
+    required this.coordinateLists,
+    this.drawPoints = false,
+    this.drawLines = true,
+    this.closeShapes = false,
+    this.lineColor,
+    this.lineWidth,
+    this.pointColor,
+    this.pointSize,
+    this.customLinePaint,
+    this.customPointPaint,
+    this.pixelPerDegree,
   }) : super(key: key);
+
+  Paint getLinePaint(BuildContext context) {
+    return customLinePaint ?? Paint()
+      ..color = lineColor ?? Theme.of(context).primaryColor
+      ..strokeWidth = lineWidth ?? 1.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+  }
+
+  Paint getPointPaint(BuildContext context) {
+    return customPointPaint ?? Paint()
+      ..color = pointColor ?? Theme.of(context).primaryColorDark
+      ..strokeWidth = pointSize ?? 3
+      ..strokeCap = StrokeCap.round;
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Center(
-          child: CustomPaint(
-            painter: _Painter(
-              CoordinateList(
-                coordinates,
-                constraints.biggest,
+          child: RepaintBoundary(
+            child: CustomPaint(
+              painter: _Painter(
+                drawLines: drawLines,
+                drawPoints: drawPoints,
+                closeShapes: closeShapes,
+                coordinates: CoordinatesToPoints(
+                  coordinateLists: coordinateLists,
+                  availableSize: constraints.biggest,
+                ),
+                linePaint: getLinePaint(context),
+                pointPaint: getPointPaint(context),
+              ),
+              child: SizedBox(
+                width: constraints.biggest.width,
+                height: constraints.biggest.height,
               ),
             ),
           ),
@@ -33,57 +120,86 @@ class CoordinateDrawer extends StatelessWidget {
 }
 
 class _Painter extends CustomPainter {
-  final CoordinateList coordinateList;
+  final CoordinatesToPoints coordinates;
+  final bool drawLines;
+  final bool drawPoints;
+  final bool closeShapes;
+  final Paint linePaint;
+  final Paint pointPaint;
 
-  _Painter(this.coordinateList);
+  _Painter({
+    required this.coordinates,
+    required this.drawLines,
+    required this.drawPoints,
+    required this.closeShapes,
+    required this.linePaint,
+    required this.pointPaint,
+  });
+
+  static const drawDebug = true;
 
   @override
   void paint(Canvas canvas, Size size) {
-    Paint linePaint = Paint()
-      ..color = Colors.black
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    Paint circlePaint = Paint()
-      ..color = Colors.red
-      ..strokeWidth = 1.2
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    Paint pointPaint = Paint()
-      ..color = Colors.blue
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
+    //* DEBUG
+    if (kDebugMode && drawDebug) {
+      canvas.drawPoints(
+          PointMode.points,
+          [
+            Offset(size.width, size.height),
+          ],
+          Paint()
+            ..color = Colors.red
+            ..strokeWidth = 5);
+    }
 
-    // move canvas for centering
-    canvas.translate(-coordinateList.center.dx, -coordinateList.center.dy);
+    //* CENTER CANVAS
+    canvas.translate((size.width - coordinates.size.width) / 2,
+        (size.height - coordinates.size.height) / 2);
 
-    for (int i = 0; i < coordinateList.length; i++) {
-      if (i > 0) {
-        canvas.drawLine(
-          coordinateList.points[i - 1],
-          coordinateList.points[i],
-          linePaint,
-        );
+    //* DRAW LINES
+    if (drawLines) {
+      for (final pointList in coordinates.pointLists) {
+        final path = Path();
+        for (int i = 0; i < pointList.length; i++) {
+          if (i == 0) {
+            path.moveTo(pointList.first.dx, pointList.first.dy);
+          } else {
+            path.lineTo(pointList[i].dx, pointList[i].dy);
+            if (i == pointList.length - 1 && closeShapes) {
+              path.lineTo(pointList.first.dx, pointList.first.dy);
+            }
+          }
+          canvas.drawPath(path, linePaint);
+        }
       }
     }
-    canvas.drawPoints(
-      PointMode.points,
-      coordinateList.points,
-      pointPaint,
-    );
 
-    canvas.drawCircle(coordinateList.center, 10, circlePaint);
+    //* DRAW POINTS
+    if (drawPoints) {
+      canvas.drawPoints(
+        PointMode.points,
+        coordinates.pointLists.expand((point) => point).toList(),
+        pointPaint,
+      );
+    }
 
-    canvas.drawRect(
-        Rect.fromPoints(coordinateList.topRight, coordinateList.bottomLeft),
-        linePaint);
+    //* DEBUG
+    if (kDebugMode && drawDebug) {
+      canvas.drawRect(
+          Rect.fromPoints(coordinates.topLeft, coordinates.bottomRight),
+          Paint()..style = PaintingStyle.stroke);
 
-    // maybe draw circle
-    canvas.drawCircle(
-      coordinateList.center,
-      coordinateList.enclosingRadius,
-      circlePaint,
-    );
+      canvas.drawPoints(
+          PointMode.points,
+          [
+            const Offset(0, 0),
+            coordinates.center,
+            Offset(coordinates.size.width, coordinates.size.height),
+          ],
+          Paint()
+            ..color = Colors.red
+            ..strokeWidth = 5);
+    }
   }
 
   @override
@@ -91,67 +207,3 @@ class _Painter extends CustomPainter {
     return false;
   }
 }
-
-// class DrawAirport {
-//   final double latAp;
-//   final double lonAp;
-//   final List<Runway> runways;
-//   DrawAirport({
-//     this.latAp,
-//     this.lonAp,
-//     this.runways,
-//   });
-
-//   double offsetX;
-//   double offsetY;
-
-//   void initCalc(Size size) {
-//     for (Runway rwy in runways) {
-//       double kScale = 0.14 * size.shortestSide;
-
-//       //Offset from Airport Reference Point -> start point
-//       rwy.startX =
-//           -(lonAp - rwy.leLonDeg) * cos((latAp) / 2 * pi / 180) * 60 * kScale;
-//       rwy.startY = (latAp - rwy.leLatDeg) * 60 * kScale;
-
-//       // Length of the x and y coordinates
-//       double _lenX = (rwy.heLonDeg - rwy.leLonDeg) *
-//           cos((latAp) / 2 * pi / 180) *
-//           60 *
-//           kScale;
-//       double _lenY = -(rwy.heLatDeg - rwy.leLatDeg) * 60 * kScale;
-
-//       // End points of the lines
-//       rwy.endX = rwy.startX + _lenX;
-//       rwy.endY = rwy.startY + _lenY;
-//     }
-//     if (runways.isNotEmpty) {
-//       // List of all drawing points
-//       List<double> valuesX = runways.map((e) => e.startX).toList() +
-//           runways.map((e) => e.endX).toList();
-//       List<double> valuesY = runways.map((e) => e.startY).toList() +
-//           runways.map((e) => e.endY).toList();
-
-//       // Get dimensions of drawing box
-//       double minX = valuesX.reduce(min);
-//       double maxX = valuesX.reduce(max);
-//       double minY = valuesY.reduce(min);
-//       double maxY = valuesY.reduce(max);
-
-//       // Center Drawing
-//       //    Offset by half of drawing box (size)
-//       //    Offset by half of drawing dimensions
-//       offsetX = size.width / 2 - ((maxX - minX) / 2 + minX);
-//       offsetY = size.height / 2 - ((maxY - minY) / 2 + minY);
-//     }
-//   }
-
-//   void drawRunways(Canvas canvas, Paint paint) {
-//     for (Runway rwy in runways) {
-//       Offset startingPoint = Offset(rwy.startX + offsetX, rwy.startY + offsetY);
-//       Offset endPoint = Offset(rwy.endX + offsetX, rwy.endY + offsetY);
-
-//       canvas.drawLine(startingPoint, endPoint, paint);
-//     }
-//   }
-// }
