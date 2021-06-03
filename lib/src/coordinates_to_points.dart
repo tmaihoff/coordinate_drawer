@@ -94,7 +94,7 @@ class CoordinatesToPoints {
   void _makePointLists() {
     pointLists = _coordinateLists
         .map((coordinates) => coordinates
-            .map((c) => _coordinateToPoint(c))
+            .map(_coordinateToPoint)
             // Position inside drawing scope (Remove offset from lat 0 / lon 0)
             .map((point) => Offset(point.dx - minX, point.dy - minY))
             .toList())
