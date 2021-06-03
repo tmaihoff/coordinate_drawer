@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class CoordinatesToPoints {
+  // TODO: schöner machen. Calculation in eigene Klasse oder Methode auslagern?
+  // ! Dann im Constructor aufrufen und direkt die final fields schreiben?
   CoordinatesToPoints({
     required List<List<Coordinate>> coordinateLists,
     required Size availableSize,
