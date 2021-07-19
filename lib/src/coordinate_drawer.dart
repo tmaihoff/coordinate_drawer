@@ -15,7 +15,7 @@ class CoordinateDrawer extends StatelessWidget {
   /// in lines being drawn between the islands.
   final List<List<Coordinate>> coordinateLists;
 
-  /// Specifies a point should be drawn for each coordinate.
+  /// Specifies if a point should be drawn for each coordinate.
   /// Defaults to false.
   final bool drawPoints;
 
