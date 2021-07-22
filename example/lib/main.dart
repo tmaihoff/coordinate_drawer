@@ -41,11 +41,24 @@ class _MyHomePageState extends State<MyHomePage> {
               border: Border.all(color: Colors.green),
               shape: BoxShape.circle,
             ),
-            child: CoordinateDrawer(
-              coordinateLists: [germany],
-              lineWidth: 1,
-              drawPoints: true,
-              // closeShapes: true,
+            child: InteractiveViewer(
+              maxScale: 100,
+              minScale: 0.1,
+              boundaryMargin: const EdgeInsets.all(200),
+              child: SizedBox(
+                height: 300,
+                width: 300,
+                child: RepaintBoundary(
+                  child: CoordinateDrawer(
+                    coordinateLists: [
+                      germany,
+                    ],
+                    closeShapes: true,
+                    lineWidth: 5,
+                    drawPoints: true,
+                  ),
+                ),
+              ),
             ),
           ),
         ),

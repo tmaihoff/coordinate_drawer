@@ -78,10 +78,10 @@ class CoordinateDrawer extends StatelessWidget {
   Paint getLinePaint(BuildContext context) {
     return customLinePaint ?? Paint()
       ..color = lineColor ?? Theme.of(context).primaryColor
-      ..strokeWidth = lineWidth ?? 1.5
+      ..strokeWidth = lineWidth ?? 15
+      ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke;
+      ..strokeJoin = StrokeJoin.round;
   }
 
   Paint getPointPaint(BuildContext context) {
@@ -162,17 +162,14 @@ class _Painter extends CustomPainter {
     //* DRAW LINES
     if (drawLines) {
       for (final pointList in coordinates.pointLists) {
-        final path = Path();
         for (int i = 0; i < pointList.length; i++) {
-          if (i == 0) {
-            path.moveTo(pointList.first.dx, pointList.first.dy);
-          } else {
-            path.lineTo(pointList[i].dx, pointList[i].dy);
+          //! Using canvas.path results in horrible lag when zooming. -> Use drawLine()
+          if (i != 0) {
+            canvas.drawLine(pointList[i - 1], pointList[i], linePaint);
             if (i == pointList.length - 1 && closeShapes) {
-              path.lineTo(pointList.first.dx, pointList.first.dy);
+              canvas.drawLine(pointList.last, pointList.first, linePaint);
             }
           }
-          canvas.drawPath(path, linePaint);
         }
       }
     }
