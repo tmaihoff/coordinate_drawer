@@ -203,7 +203,9 @@ class _Painter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
+  bool shouldRepaint(_Painter oldDelegate) {
+    // Rebuild when paints change. This allows scale control
+    return oldDelegate.linePaint != linePaint ||
+        oldDelegate.pointPaint != pointPaint;
   }
 }
