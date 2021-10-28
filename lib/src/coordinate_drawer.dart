@@ -95,7 +95,9 @@ class CoordinateDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Center(
+        return coordinateLists.isEmpty 
+        ? Container()
+        : Center(
           child: RepaintBoundary(
             child: CustomPaint(
               painter: _Painter(
