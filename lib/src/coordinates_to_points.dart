@@ -59,8 +59,8 @@ class CoordinatesToPoints {
         .map((coordinateList) => coordinateList
             // center every coordinate for symmetric drawing
             .map((e) =>
-                Coordinate(lat: e.lat, lon: e.lon - coordinateBounds.centerX))
-            .toList())
+                Coordinate(lat: e.lat, lon: e.lon - coordinateBounds.centerX),)
+            .toList(),)
         .toList();
   }
 
@@ -99,7 +99,7 @@ class CoordinatesToPoints {
             .map(_coordinateToPoint)
             // Position inside drawing scope (Remove offset from lat 0 / lon 0)
             .map((point) => Offset(point.dx - minX, point.dy - minY))
-            .toList())
+            .toList(),)
         .toList();
   }
 

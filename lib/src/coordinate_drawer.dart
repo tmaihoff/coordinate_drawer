@@ -1,10 +1,8 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
+import 'package:coordinate_drawer/src/coordinates_to_points.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'coordinates_to_points.dart';
 
 class CoordinateDrawer extends StatelessWidget {
   /// List of coordinate lists which should be painted.
@@ -61,7 +59,7 @@ class CoordinateDrawer extends StatelessWidget {
   final double? pixelPerDegree;
 
   const CoordinateDrawer({
-    Key? key,
+    super.key,
     required this.coordinateLists,
     this.drawPoints = false,
     this.drawLines = true,
@@ -73,7 +71,7 @@ class CoordinateDrawer extends StatelessWidget {
     this.customLinePaint,
     this.customPointPaint,
     this.pixelPerDegree,
-  }) : super(key: key);
+  });
 
   Paint getLinePaint(BuildContext context) {
     return customLinePaint ?? Paint()
@@ -95,30 +93,30 @@ class CoordinateDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return coordinateLists.isEmpty 
-        ? Container()
-        : Center(
-          child: RepaintBoundary(
-            child: CustomPaint(
-              painter: _Painter(
-                drawLines: drawLines,
-                drawPoints: drawPoints,
-                closeShapes: closeShapes,
-                coordinates: CoordinatesToPoints(
-                  coordinateLists: coordinateLists,
-                  availableSize: constraints.biggest,
-                  customPixelPerDegree: pixelPerDegree,
+        return coordinateLists.isEmpty
+            ? Container()
+            : Center(
+                child: RepaintBoundary(
+                  child: CustomPaint(
+                    painter: _Painter(
+                      drawLines: drawLines,
+                      drawPoints: drawPoints,
+                      closeShapes: closeShapes,
+                      coordinates: CoordinatesToPoints(
+                        coordinateLists: coordinateLists,
+                        availableSize: constraints.biggest,
+                        customPixelPerDegree: pixelPerDegree,
+                      ),
+                      linePaint: getLinePaint(context),
+                      pointPaint: getPointPaint(context),
+                    ),
+                    child: SizedBox(
+                      width: constraints.biggest.width,
+                      height: constraints.biggest.height,
+                    ),
+                  ),
                 ),
-                linePaint: getLinePaint(context),
-                pointPaint: getPointPaint(context),
-              ),
-              child: SizedBox(
-                width: constraints.biggest.width,
-                height: constraints.biggest.height,
-              ),
-            ),
-          ),
-        );
+              );
       },
     );
   }
@@ -148,18 +146,21 @@ class _Painter extends CustomPainter {
     //* DEBUG
     if (kDebugMode && drawDebug) {
       canvas.drawPoints(
-          PointMode.points,
-          [
-            Offset(size.width, size.height),
-          ],
-          Paint()
-            ..color = Colors.red
-            ..strokeWidth = 5);
+        PointMode.points,
+        [
+          Offset(size.width, size.height),
+        ],
+        Paint()
+          ..color = Colors.red
+          ..strokeWidth = 5,
+      );
     }
 
     //* CENTER CANVAS
-    canvas.translate((size.width - coordinates.size.width) / 2,
-        (size.height - coordinates.size.height) / 2);
+    canvas.translate(
+      (size.width - coordinates.size.width) / 2,
+      (size.height - coordinates.size.height) / 2,
+    );
 
     //* DRAW LINES
     if (drawLines) {
@@ -188,19 +189,21 @@ class _Painter extends CustomPainter {
     //* DEBUG
     if (kDebugMode && drawDebug) {
       canvas.drawRect(
-          Rect.fromPoints(coordinates.topLeft, coordinates.bottomRight),
-          Paint()..style = PaintingStyle.stroke);
+        Rect.fromPoints(coordinates.topLeft, coordinates.bottomRight),
+        Paint()..style = PaintingStyle.stroke,
+      );
 
       canvas.drawPoints(
-          PointMode.points,
-          [
-            const Offset(0, 0),
-            coordinates.center,
-            Offset(coordinates.size.width, coordinates.size.height),
-          ],
-          Paint()
-            ..color = Colors.red
-            ..strokeWidth = 5);
+        PointMode.points,
+        [
+          Offset.zero,
+          coordinates.center,
+          Offset(coordinates.size.width, coordinates.size.height),
+        ],
+        Paint()
+          ..color = Colors.red
+          ..strokeWidth = 5,
+      );
     }
   }
 
